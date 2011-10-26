@@ -32,26 +32,31 @@
 	<xsl:element name="testcase">
 		
 		<xsl:attribute name="classname">
-			
+			<xsl:value-of select ="@identity"/>
+			<xsl:value-of select ="@description"/>
 		</xsl:attribute>
 		
 		<xsl:attribute name="name">
 			<xsl:value-of select ="@description"/>
 		</xsl:attribute>
+		<xsl:attribute name="time">0.00</xsl:attribute>
 		
 		<xsl:if test ="@isSuccessful='false'">
-			<xsl:element name="error" >
+			<xsl:element name="failure" >
 				<xsl:attribute name="type">error</xsl:attribute>
+				
 				<xsl:attribute name="message">
+					<xsl:value-of select ="@identity"/>
 					<xsl:apply-templates select="action" />
 				</xsl:attribute>
 			</xsl:element>
 		</xsl:if>
-		
+		<!--
 		<xsl:element name="stacktrace">
 			<xsl:value-of select ="@identity"/>
 			<xsl:apply-templates select="action" />
 		</xsl:element>
+		-->
 	</xsl:element>    
   </xsl:template>
 
