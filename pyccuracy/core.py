@@ -132,7 +132,7 @@ class PyccuracyCore(object):
                 else:
                     import report_parser as report
                     path = join(context.settings.report_file_dir, context.settings.report_file_name)
-                    report.generate_report(path, results, context.language)
+                    report.generate_report(path, results, context)
 
             self.hooks.execute_after_tests(results)
             

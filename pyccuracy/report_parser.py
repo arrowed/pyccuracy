@@ -32,11 +32,11 @@ from lxml import etree as ET
 
 from pyccuracy import Version
 
-def generate_report(file_path, test_result, language):
-    xslt = open(join(split(__file__)[0], "xslt/AccuracyReport_%s.xslt" % language.key))
+def generate_report(file_path, test_result, context):
+    xslt = open(join(split(__file__)[0], "xslt/AccuracyReport_%s.xslt" % context.language.key))
     xslt_doc = etree.parse(xslt)
     transform = etree.XSLT(xslt_doc)
-    doc = generate_xml(test_result, language)
+    doc = generate_xml(test_result, context)
     result_tree = transform(doc)
 
     if exists(file_path):
@@ -46,7 +46,7 @@ def generate_report(file_path, test_result, language):
     html.write(str(result_tree))
     html.close()
 
-def generate_xml(test_result, language):
+def generate_xml(test_result, context):
     total_stories = float(test_result.fixture.count_total_stories())
     total_scenarios = float(test_result.fixture.count_total_scenarios())
     successful_stories = test_result.fixture.count_successful_stories()
@@ -62,7 +62,7 @@ def generate_xml(test_result, language):
     stories = []
     for story in test_result.fixture.stories:
         index += 1
-        stories.append(__generate_story(story, index, language))
+        stories.append(__generate_story(story, index, context))
 
     doc = E.report(
         E.header(
@@ -77,6 +77,7 @@ def generate_xml(test_result, language):
         ),
         E.summary(
             {
+                "browser": str(context.settings.browser_to_run),
                 "totalStories":"%.0f" % total_stories,
                 "totalScenarios":"%.0f" % total_scenarios,
                 "successfulScenarios":str(successful_scenarios),
@@ -97,18 +98,19 @@ def generate_xml(test_result, language):
     #print etree.tostring(doc, pretty_print=True)
     return doc
 
-def __generate_story(story, story_index, language):
+def __generate_story(story, story_index, context):
     scenarios = []
     for scenario in story.scenarios:
-        scenarios.append(__generate_scenario(scenario, language))
-
+        scenarios.append(__generate_scenario(scenario, context))
+    
     story_doc = E.story(
                     {
                         "index":str(story_index),
                         "identity":story.identity,
-                        "asA":"%s %s" % (language.get("as_a"), story.as_a),
-                        "iWant":"%s %s" % (language.get("i_want_to"), story.i_want_to),
-                        "soThat":"%s %s" % (language.get("so_that"), story.so_that),
+                        "browser": str(context.settings.browser_to_run),
+                        "asA":"%s %s" % (context.language.get("as_a"), story.as_a),
+                        "iWant":"%s %s" % (context.language.get("i_want_to"), story.i_want_to),
+                        "soThat":"%s %s" % (context.language.get("so_that"), story.so_that),
                         "isSuccessful":(story.status == "SUCCESSFUL" and "true" or "false")
                     }
                 )
@@ -118,7 +120,7 @@ def __generate_story(story, story_index, language):
 
     return story_doc
 
-def __generate_scenario(scenario, language):
+def __generate_scenario(scenario, context):
     if scenario.status == "SUCCESSFUL":
         scenario_total_time = scenario.ellapsed()
         scenario_finish_time = time.asctime(time.localtime(scenario.end_time))
@@ -128,30 +130,32 @@ def __generate_scenario(scenario, language):
 
     actions = []
     odd = True
-    actions.append(__generate_given(language, odd))
+    actions.append(__generate_given(context.language, odd))
     odd = not odd
     for action in scenario.givens:
-        actions.append(__generate_action(action, language, odd))
+        actions.append(__generate_action(action, context.language, odd))
         odd = not odd
 
-    actions.append(__generate_when(language, odd))
+    actions.append(__generate_when(context.language, odd))
     odd = not odd
     for action in scenario.whens:
-        actions.append(__generate_action(action, language, odd))
+        actions.append(__generate_action(action, context.language, odd))
         odd = not odd
 
-    actions.append(__generate_then(language, odd))
+    actions.append(__generate_then(context.language, odd))
     odd = not odd
     for action in scenario.thens:
-        actions.append(__generate_action(action, language, odd))
+        actions.append(__generate_action(action, context.language, odd))
         odd = not odd
 
     #action_text = "".join([etree.tostring(action, pretty_print=False) for action in actions]).replace('"', '&quot;')
 
     scenario_status = scenario.status == "SUCCESSFUL" and "true" or "false"
-
+    print str(context.settings.browser_to_run)
+    
     scenario_doc = E.scenario(
                                 {
+                                    "browser": str(context.settings.browser_to_run),
                                     "index":str(scenario.index),
                                     "description":scenario.title,
                                     "totalTime": "%.2f" % scenario_total_time,
