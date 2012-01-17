@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:msxsl="urn:schemas-microsoft-com:xslt" exclude-result-prefixes="msxsl">
   <xsl:output method="xml" version="1.0" encoding="iso-8859-1" indent="yes" />
@@ -18,7 +18,7 @@
 
   <xsl:template match="/report/stories/story">
 	<xsl:element name="testsuite">
-		<xsl:attribute name="name">Scenario <xsl:value-of select ="@index"/>: <xsl:value-of select ="@identity"/></xsl:attribute>
+		<xsl:attribute name="name">[<xsl:value-of select ="@browser" />] Scenario <xsl:value-of select ="@index"/>: <xsl:value-of select ="@identity"/></xsl:attribute>
 		<xsl:attribute name="tests"><xsl:value-of select ="@totalStories" /></xsl:attribute>
 		<xsl:attribute name="errors">0</xsl:attribute>
 		<xsl:attribute name="failures"><xsl:value-of select ="@failedScenarios" /></xsl:attribute>
@@ -31,14 +31,12 @@
   <xsl:template match="/report/stories/story/scenario">
 	<xsl:element name="testcase">
 		
-		<xsl:attribute name="classname">
+		<xsl:attribute name="classname">[<xsl:value-of select ="@browser" />]
 			<xsl:value-of select ="@identity"/>
 			<xsl:value-of select ="@description"/>
 		</xsl:attribute>
 		
-		<xsl:attribute name="name">
-			<xsl:value-of select ="@description"/>
-		</xsl:attribute>
+		<xsl:attribute name="name">[<xsl:value-of select ="@browser" />] <xsl:value-of select ="@description"/></xsl:attribute>
 		<xsl:attribute name="time">0.00</xsl:attribute>
 		
 		<xsl:if test ="@isSuccessful='false'">
