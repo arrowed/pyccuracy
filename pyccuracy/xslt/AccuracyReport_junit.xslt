@@ -31,9 +31,7 @@
   <xsl:template match="/report/stories/story/scenario">
 	<xsl:element name="testcase">
 		
-		<xsl:attribute name="classname">[<xsl:value-of select ="@browser" />]
-			<xsl:value-of select ="@identity"/>
-			<xsl:value-of select ="@description"/>
+		<xsl:attribute name="classname">[<xsl:value-of select ="@browser" />] <xsl:value-of select ="@identity"/><xsl:value-of select ="@description"/>
 		</xsl:attribute>
 		
 		<xsl:attribute name="name">[<xsl:value-of select ="@browser" />] <xsl:value-of select ="@description"/></xsl:attribute>

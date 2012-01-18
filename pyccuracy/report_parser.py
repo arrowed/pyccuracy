@@ -151,7 +151,6 @@ def __generate_scenario(scenario, context):
     #action_text = "".join([etree.tostring(action, pretty_print=False) for action in actions]).replace('"', '&quot;')
 
     scenario_status = scenario.status == "SUCCESSFUL" and "true" or "false"
-    print str(context.settings.browser_to_run)
     
     scenario_doc = E.scenario(
                                 {
